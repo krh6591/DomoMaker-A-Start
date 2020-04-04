@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 mongoose.Promise = global.Promise;
 const _ = require('underscore');
 
@@ -12,34 +13,34 @@ const DomoSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    set: setName
+    set: setName,
   },
   age: {
     type: Number,
     min: 0,
-    required: true
+    required: true,
   },
   owner: {
     type: mongoose.Schema.ObjectId,
     required: true,
-    ref: 'Account'
+    ref: 'Account',
   },
   createdDate: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 DomoSchema.statics.toAPI = (doc) => ({
   name: doc.name,
-  age: doc.age
+  age: doc.age,
 });
 
 DomoSchema.statics.findByOwner = (ownerId, callback) => {
   const search = {
-    owner: convertId(ownerId)
+    owner: convertId(ownerId),
   };
-  
+
   return DomoModel.find(search).select('name age').lean().exec(callback);
 };
 
@@ -47,5 +48,5 @@ DomoModel = mongoose.model('Domo', DomoSchema);
 
 module.exports = {
   DomoModel,
-  DomoSchema
-}
+  DomoSchema,
+};
