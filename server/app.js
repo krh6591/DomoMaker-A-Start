@@ -1,6 +1,7 @@
 // Library imports
 const path = require('path');
 const express = require('express');
+const session = require('express-session');
 const compression = require('compression');
 const favicon = require('serve-favicon');
 const cookieParser = require('cookie-parser');
@@ -33,6 +34,12 @@ app.use(favicon(`${__dirname}/../hosted/img/favicon.png`));
 app.use(compression());
 app.use(bodyParser.urlencoded({
   extended: true,
+}));
+app.use(session({
+  key: 'sessionid',
+  secret: 'Domo Arigato',
+  resave: true,
+  saveUninitialized: true
 }));
 app.engine('handlebars', expressHandlebars({
   defaultLayout: 'main',
