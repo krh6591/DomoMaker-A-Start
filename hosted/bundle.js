@@ -1,11 +1,40 @@
 "use strict";
 
+// Limit which domos are rendered based on selected team
+var controlRender = function controlRender() {
+  var selected = document.querySelector("#renderedTeam").selectedOptions[0].value;
+  console.log(selected);
+  var all = selected === "All";
+  var red = selected === "Red";
+  var blu = selected === "Blue";
+  var domosBlu = document.getElementsByClassName("domo");
+  var domosRed = document.getElementsByClassName("domoRed"); // Disable or enable viewing of all blue domos
+
+  for (var i = 0; i < domosBlu.length; ++i) {
+    if (all || blu) {
+      domosBlu[i].style.display = "block";
+    } else {
+      domosBlu[i].style.display = "none";
+    }
+  } // Disable or enable viewing of all red domos
+
+
+  for (var _i = 0; _i < domosRed.length; ++_i) {
+    if (all || red) {
+      domosRed[_i].style.display = "block";
+    } else {
+      domosRed[_i].style.display = "none";
+    }
+  }
+};
+
 var loadDomosFromServer = function loadDomosFromServer() {
   sendAjax('GET', '/getDomos', null, function (data) {
     ReactDOM.render( /*#__PURE__*/React.createElement(DomoList, {
       domos: data.domos
     }), document.querySelector("#domos"));
   });
+  controlRender();
 };
 
 var handleDomo = function handleDomo(e) {
@@ -45,10 +74,21 @@ var DomoForm = function DomoForm(props) {
       htmlFor: "age"
     }, "Age: "), /*#__PURE__*/React.createElement("input", {
       id: "domoAge",
-      type: "password",
+      type: "text",
       name: "age",
       placeholder: "Domo Age"
-    }), /*#__PURE__*/React.createElement("input", {
+    }), /*#__PURE__*/React.createElement("label", {
+      htmlFor: "team"
+    }, "Team: "), /*#__PURE__*/React.createElement("select", {
+      id: "domoTeam",
+      name: "team",
+      form: "domoForm",
+      selected: "Blue"
+    }, /*#__PURE__*/React.createElement("option", {
+      value: "Blue"
+    }, "Blue"), /*#__PURE__*/React.createElement("option", {
+      value: "Red"
+    }, "Red")), /*#__PURE__*/React.createElement("input", {
       type: "hidden",
       name: "_csrf",
       value: props.csrf
@@ -71,9 +111,12 @@ var DomoList = function DomoList(props) {
   }
 
   var domoNodes = props.domos.map(function (domo) {
+    // Display teams by using different-colored bases
+    var domoClass = domo.team ? "domoRed" : "domo";
+    console.log(domo.team);
     return (/*#__PURE__*/React.createElement("div", {
         key: domo._id,
-        className: "domo"
+        className: domoClass
       }, /*#__PURE__*/React.createElement("img", {
         src: "/assets/img/domoface.jpeg",
         alt: "domo face",
@@ -97,7 +140,9 @@ var setup = function setup(csrf) {
   }), document.querySelector("#makeDomo"));
   ReactDOM.render( /*#__PURE__*/React.createElement(DomoList, {
     domos: []
-  }), document.querySelector("#domos"));
+  }), document.querySelector("#domos")); // Limit rendered domos to the selected team; update on change
+  // $("#renderedTeam").addEventListener("change", controlRender);
+
   loadDomosFromServer();
 };
 

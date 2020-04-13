@@ -14,6 +14,7 @@ const makerPage = (req, res) => {
 };
 
 const makeDomo = (req, res) => {
+  // Team is optional, and defaults to blue
   if (!req.body.name || !req.body.age) {
     return res.status(400).json({ error: 'RAWR! Both name and age are required' });
   }
@@ -23,6 +24,11 @@ const makeDomo = (req, res) => {
     age: req.body.age,
     owner: req.session.account._id,
   };
+  // Put team in if provided
+  if (req.body.team) {
+    // Team is sent as a string, but held as a bool
+    domoData.team = req.body.team !== 'Blue';
+  }
 
   const newDomo = new Domo.DomoModel(domoData);
 
@@ -42,16 +48,17 @@ const makeDomo = (req, res) => {
   return domoPromise;
 };
 
+// TODO : The things
 const getDomos = (request, response) => {
   const req = request;
   const res = response;
-  
+
   return Domo.DomoModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
       console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
-    
+
     return res.json({ domos: docs });
   });
 };
@@ -59,5 +66,5 @@ const getDomos = (request, response) => {
 module.exports = {
   makerPage,
   makeDomo,
-  getDomos
+  getDomos,
 };

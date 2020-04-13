@@ -1,9 +1,43 @@
+// Limit which domos are rendered based on selected team
+const controlRender = () => {
+  let selected = document.querySelector("#renderedTeam").selectedOptions[0].value;
+  
+  const all = selected === "All";
+  const red = selected === "Red";
+  const blu = selected === "Blue";
+  
+  const domosBlu = document.getElementsByClassName("domo");
+  const domosRed = document.getElementsByClassName("domoRed");
+  
+  // Disable or enable viewing of all blue domos
+  for (let i = 0; i < domosBlu.length; ++i) {
+    if (all || blu) {
+      domosBlu[i].style.display = "block";
+    }
+    else {
+      domosBlu[i].style.display = "none";
+    }
+  }
+  
+  // Disable or enable viewing of all red domos
+  for (let i = 0; i < domosRed.length; ++i) {
+    if (all || red) {
+      domosRed[i].style.display = "block";
+    }
+    else {
+      domosRed[i].style.display = "none";
+    }
+  }
+}
+
 const loadDomosFromServer = () => {
   sendAjax('GET', '/getDomos', null, (data) => {
     ReactDOM.render(
       <DomoList domos={data.domos} />, document.querySelector("#domos")
     );
   });
+  
+  controlRender();
 };
 
 const handleDomo = (e) => {
@@ -39,6 +73,11 @@ const DomoForm = (props) => {
     <input id="domoName" type="text" name="name" placeholder="Domo Name"/>
     <label htmlFor="age">Age: </label>
     <input id="domoAge" type="text" name="age" placeholder="Domo Age"/>
+    <label htmlFor="team">Team: </label>
+    <select id="domoTeam" name="team" form="domoForm" selected="Blue">
+      <option value="Blue">Blue</option>
+      <option value="Red">Red</option>
+    </select>
     <input type="hidden" name="_csrf" value={props.csrf}/>
     <input className="makeDomoSubmit" type="submit" valu="Make Domo" />
     </form>
@@ -55,8 +94,11 @@ const DomoList = function(props) {
   }
   
   const domoNodes = props.domos.map(function(domo) {
+    // Display teams by using different-colored bases
+    const domoClass = domo.team ? "domoRed" : "domo";
+    console.log(domo.team);
     return (
-      <div key={domo._id} className="domo">
+      <div key={domo._id} className={domoClass}>
         <img src="/assets/img/domoface.jpeg" alt="domo face" className="domoFace" />
         <h3 className="domoName"> Name: {domo.name} </h3>
         <h3 classNAme="domoAge"> Age: {domo.age} </h3>
@@ -79,6 +121,9 @@ const setup = function(csrf) {
   ReactDOM.render(
     <DomoList domos={[]} />, document.querySelector("#domos")
   );
+  
+  // Limit rendered domos to the selected team; update on change
+  // $("#renderedTeam").addEventListener("change", controlRender);
   
   loadDomosFromServer();
 }

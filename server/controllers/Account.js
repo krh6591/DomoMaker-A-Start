@@ -81,18 +81,18 @@ const signup = (request, response) => {
 const getToken = (request, response) => {
   const req = request;
   const res = response;
-  
+
   const csrfJSON = {
-    csrfToken: req.csrfToken()
+    csrfToken: req.csrfToken(),
   };
-  
+
   res.json(csrfJSON);
-}
+};
 
 module.exports = {
   loginPage,
   login,
   logout,
   signup,
-  getToken
+  getToken,
 };
